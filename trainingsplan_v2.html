@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Trainingsplan V2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #e8ff00;
+    --accent2: #ff4d00;
+    --text: #f0f0f0;
+    --muted: #666;
+    --push: #ff4d00;
+    --legs: #00c2ff;
+    --pull: #e8ff00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .version-badge {
+    background: var(--accent);
+    color: #000;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0;
+    padding: 12px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab.active-push { color: var(--push); border-bottom-color: var(--push); }
+  .tab.active-legs { color: var(--legs); border-bottom-color: var(--legs); }
+  .tab.active-pull { color: var(--pull); border-bottom-color: var(--pull); }
+  .tab.active-info { color: var(--text); border-bottom-color: var(--text); }
+
+  /* CONTENT */
+  .content { display: none; padding: 20px; }
+  .content.active { display: block; }
+
+  /* DAY HEADER */
+  .day-header {
+    margin-bottom: 24px;
+  }
+
+  .day-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .push .day-label { color: var(--push); }
+  .legs .day-label { color: var(--legs); }
+  .pull .day-label { color: var(--pull); }
+
+  .day-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .day-focus {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* TIP BOX */
+  .tip-box {
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .push .tip-box { background: rgba(255,77,0,0.1); border-left: 3px solid var(--push); }
+  .legs .tip-box { background: rgba(0,194,255,0.1); border-left: 3px solid var(--legs); }
+  .pull .tip-box { background: rgba(232,255,0,0.1); border-left: 3px solid var(--pull); }
+
+  .tip-box strong { font-weight: 600; }
+
+  /* EXERCISE CARDS */
+  .exercises { display: flex; flex-direction: column; gap: 10px; }
+
+  .exercise-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .exercise-card.open { border-color: var(--border); }
+  .push .exercise-card.open { border-color: rgba(255,77,0,0.4); }
+  .legs .exercise-card.open { border-color: rgba(0,194,255,0.4); }
+  .pull .exercise-card.open { border-color: rgba(232,255,0,0.4); }
+
+  .exercise-main {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 14px;
+  }
+
+  .exercise-sets {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+  }
+  .push .exercise-sets { background: rgba(255,77,0,0.15); }
+  .legs .exercise-sets { background: rgba(0,194,255,0.15); }
+  .pull .exercise-sets { background: rgba(232,255,0,0.15); }
+
+  .sets-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .push .sets-num { color: var(--push); }
+  .legs .sets-num { color: var(--legs); }
+  .pull .sets-num { color: var(--pull); }
+
+  .sets-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .exercise-info { flex: 1; min-width: 0; }
+
+  .exercise-name {
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .exercise-reps {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .exercise-chevron {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .exercise-card.open .exercise-chevron { transform: rotate(180deg); }
+
+  /* EXPAND DETAIL */
+  .exercise-detail {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .exercise-card.open .exercise-detail { display: block; }
+
+  .detail-why {
+    padding-top: 14px;
+  }
+
+  .detail-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .detail-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ccc;
+  }
+
+  /* WEIGHT TRACKER */
+  .weight-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .weight-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .week-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .week-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .week-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    padding: 6px 2px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .week-input:focus {
+    border-color: var(--accent);
+  }
+
+  /* INFO TAB */
+  .info-section { margin-bottom: 28px; }
+
+  .info-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #ccc;
+  }
+
+  .info-card p + p { margin-top: 10px; }
+
+  /* V-TAPER TABLE */
+  .vtaper-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .vtaper-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .vtaper-stars {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 52px;
+  }
+
+  .vtaper-info { flex: 1; }
+
+  .vtaper-exercise {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .vtaper-effect {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* OVERLOAD TABLE */
+  .overload-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .overload-table th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .overload-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    color: #ccc;
+  }
+
+  .overload-table tr:last-child td { border-bottom: none; }
+
+  /* STRETCH LIST */
+  .stretch-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .stretch-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  .stretch-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* PROFILE STRIP */
+  .profile-strip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .profile-item { }
+
+  .profile-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .profile-value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <h1>TRAININGSPLAN</h1>
+    <div class="version-badge">V2</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active-push" onclick="showTab('push', this)">MON — Push</button>
+    <button class="tab" onclick="showTab('legs', this)">MI — Legs</button>
+    <button class="tab" onclick="showTab('pull', this)">FR — Pull</button>
+    <button class="tab" onclick="showTab('info', this)">Info & Tipps</button>
+  </div>
+</div>
+
+<!-- ===== TAG A: PUSH ===== -->
+<div id="tab-push" class="content active push">
+  <div class="day-header">
+    <div class="day-label">Montag · Tag A</div>
+    <div class="day-title">PUSH</div>
+    <div class="day-focus">Brust · Schultern · Trizeps</div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Tipp:</strong> Schultern zuerst wenn du frisch bist — sie sind dein wichtigster V-Taper-Muskel.
+  </div>
+
+  <div class="exercises">
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">4</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Schulterdrücken KH (sitzend)</div>
+          <div class="exercise-reps">8–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Breite Schultern sind V-Taper Hebel Nr. 1. Je breiter die Schultern, desto schmaler wirkt die Taille optisch.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Sitz stabil, Rücken angelehnt. Hanteln auf Ohrhöhe starten, Ellenbogen leicht vor der Körperachse. Oben nicht ganz durchstrecken, Spannung halten.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">4</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Seitliches Heben KH</div>
+          <div class="exercise-reps">12–15 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Mittlerer Schultermuskel — dieser macht dich optisch breiter. Kein anderes Isolationsmovement hat so einen grossen visuellen Effekt.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Arme leicht gebeugt. Heben bis Schulterhöhe, kleinen Finger leicht nach oben drehen (wie eine Giesskanne ausleeren). Kontrolliert absenken, kein Schwung.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">4</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Schrägbank KH Drücken</div>
+          <div class="exercise-reps">8–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Obere Brust aufbauen gibt dem Brustkasten Volumen und Fülle von oben — wichtig für die V-Form.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Bank ca. 30–45° geneigt. Hanteln zur Seite der Brust absenken, Ellenbogen ca. 45° vom Körper. Oben zusammendrücken, Schulterblätter bleibt zurückgezogen.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Flachbank Drücken (Maschine)</div>
+          <div class="exercise-reps">10–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Gesamte Brust ansprechen mit sicherer Kontrolle — Maschine ist ideal wenn du ohne Spotter trainierst.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Sitz so einstellen, dass die Griffe auf Brusthöhe sind. Schulterblätter zurück und runter festhalten während du drückst. Vollständige Bewegung, kontrolliert zurück.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Trizeps Pushdown Kabel (Seil)</div>
+          <div class="exercise-reps">12–15 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Trizeps macht 2/3 des Oberarms aus. Grosse Arme brauchen einen starken Trizeps, nicht primär einen grossen Bizeps.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Ellenbogen eng am Körper, nur Unterarme bewegen. Unten kurz kontrahieren, Seil nach aussen ziehen am Endpunkt. Langsam zurück.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Overhead Trizeps Extension (Kabel)</div>
+          <div class="exercise-reps">12–15 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Der lange Trizepskopf wird hier am besten gedehnt und trainiert — gibt dem Arm von hinten die volle Form.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Seil hinter dem Kopf, Ellenbogen zeigen nach oben. Arme nach oben strecken ohne die Ellenbogen zu bewegen. Volle Dehnung unten wichtig.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== TAG B: LEGS ===== -->
+<div id="tab-legs" class="content legs">
+  <div class="day-header">
+    <div class="day-label">Mittwoch · Tag B</div>
+    <div class="day-title">LEGS & CORE</div>
+    <div class="day-focus">Beine · Core — effizient, kein Stress</div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Merke:</strong> Grosse Beinmuskeln = grösster Kalorienverbrauch → helfen direkt beim Fettabbau.
+  </div>
+
+  <div class="exercises">
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">4</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Beinpresse</div>
+          <div class="exercise-reps">10–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Kniebeugen-Ersatz ohne Langhantel auf dem Nacken — gleicher Effekt, aber kein Nackenstress und einfacher zu kontrollieren.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Füsse schulterbreit auf der Platte. Rücken immer an der Polsterung lassen. Nicht zu tief wenn Knie schmerzen — 90° ist ausreichend. Fersen drücken.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Beinstrecker (Maschine)</div>
+          <div class="exercise-reps">12–15 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Quadrizeps isoliert trainieren gibt dem Oberschenkel eine klare Form und ergänzt die Beinpresse.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Oben kurz kontrahieren und halten. Langsam ablassen — die negative Phase ist genauso wichtig. Kein Schwung.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Beinbeuger liegend (Maschine)</div>
+          <div class="exercise-reps">12–15 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Hinterschenkel für Balance und Kniegesundheit. Ein starker Hinterschenkel schützt das Knie und verbessert die Gesamtproportionen.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Volle Bewegung bis zur maximalen Beugung. Hüfte an der Auflage lassen, nicht nach oben drücken. Kontrolliert zurück.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">4</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Wadenheben (Maschine)</div>
+          <div class="exercise-reps">15–20 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Sauberer Abschluss des Beins. Waden brauchen hohe Wiederholungen und volle Bewegung für Wachstum.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Ganz oben halten (1 Sek), ganz unten dehnen. Langsames Tempo. Kein Schwung, kein Hüpfen.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Plank</div>
+          <div class="exercise-reps">30–45 Sek halten</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Core-Stabilität schützt den Rücken bei allen anderen Übungen. Kein fancy Bauchtraining nötig, Plank reicht.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Körper gerade wie ein Brett von Kopf bis Fersen. Po nicht hochstrecken, nicht durchhängen. Bauchnabel leicht reinziehen, atmen.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== TAG C: PULL ===== -->
+<div id="tab-pull" class="content pull">
+  <div class="day-header">
+    <div class="day-label">Freitag · Tag C</div>
+    <div class="day-title">PULL</div>
+    <div class="day-focus">Rücken · Bizeps — V-Taper Haupttag</div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Tipp Latziehen:</strong> Stell dir vor, du willst deine Ellenbogen in die Hosentaschen ziehen — nicht mit den Armen ziehen, sondern mit dem Rücken.
+  </div>
+
+  <div class="exercises">
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">4</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Latziehen weiter Griff (Maschine)</div>
+          <div class="exercise-reps">8–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Breiter Rücken ist V-Taper Hebel Nr. 2. Weiter Griff aktiviert die Latissimi maximal für Breite.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Oberkörper leicht zurückgelehnt. Stange zum Kinn ziehen, Ellenbogen nach unten in Richtung Hosentaschen. Oben vollständig strecken für volle Dehnung.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Latziehen enger Griff / Untergriff</div>
+          <div class="exercise-reps">10–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Rückendicke und mehr Volumen von hinten — ergänzt den weiten Griff für eine vollständige Rückenentwicklung.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Untergriff oder enger neutraler Griff. Ellenbogen eng am Körper nach unten ziehen. Brustbein leicht nach vorne heben am Ende der Bewegung.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Seilzug Rudern sitzend</div>
+          <div class="exercise-reps">10–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Mittlerer Rücken und Haltungsmuskulatur — wichtig für eine aufrechte Körperhaltung und Verletzungsschutz.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Schulterblätter zusammenziehen wenn du ziehst. Ellenbogen eng am Körper. Oberkörper bleibt aufrecht, nicht mit Schwung zurücklehnen.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Face Pulls Kabel (Seil)</div>
+          <div class="exercise-reps">15–20 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Hintere Schulter aufbauen gibt runde volle Schultern und schützt das Schultergelenk langfristig vor Verletzungen.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Kabel auf Augenhöhe. Seil zum Gesicht ziehen, Hände neben den Ohren, Ellenbogen hoch und nach hinten. Kurz halten, kontrolliert zurück. Leichtes Gewicht, saubere Ausführung.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Bizeps Curl KH (abwechselnd)</div>
+          <div class="exercise-reps">10–12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Klassisch, volle Bewegung, beste Aktivierung. Abwechselnd erlaubt volle Konzentration pro Arm.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Ellenbogen fix am Körper. Vollständig strecken unten für maximale Dehnung. Oben leicht eindrehen (Supination). Kein Schwung mit dem Oberkörper.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" onclick="toggleCard(this)">
+      <div class="exercise-main">
+        <div class="exercise-sets"><div class="sets-num">3</div><div class="sets-label">Sätze</div></div>
+        <div class="exercise-info">
+          <div class="exercise-name">Hammer Curl KH</div>
+          <div class="exercise-reps">12 Wdh</div>
+        </div>
+        <div class="exercise-chevron">⌄</div>
+      </div>
+      <div class="exercise-detail">
+        <div class="detail-why">
+          <div class="detail-section-label">Warum</div>
+          <div class="detail-text">Trainiert den Brachialis unter dem Bizeps — dieser drückt den Bizeps nach oben und gibt Armbreite von der Seite.</div>
+        </div>
+        <div class="detail-why" style="margin-top:12px">
+          <div class="detail-section-label">Ausführung</div>
+          <div class="detail-text">Neutraler Griff (Daumen zeigt nach oben wie beim Hämmern). Sonst gleich wie Bizeps Curl. Keine Rotation des Handgelenks.</div>
+        </div>
+        <div class="weight-section">
+          <div class="detail-section-label">Gewichts-Tracker (kg)</div>
+          <div class="weight-grid">
+            <div class="week-cell"><div class="week-label">W1</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W2</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W3</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W4</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W5</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+            <div class="week-cell"><div class="week-label">W6</div><input class="week-input" type="text" inputmode="decimal" placeholder="—"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== INFO TAB ===== -->
+<div id="tab-info" class="content">
+
+  <div class="info-section">
+    <div class="info-title">DEIN PROFIL</div>
+    <div class="profile-strip">
+      <div class="profile-item"><div class="profile-label">Level</div><div class="profile-value">Wiedereinsteiger</div></div>
+      <div class="profile-item"><div class="profile-label">Ziel</div><div class="profile-value">Body Recomp</div></div>
+      <div class="profile-item"><div class="profile-label">Training</div><div class="profile-value">3× / Woche</div></div>
+      <div class="profile-item"><div class="profile-label">Phase</div><div class="profile-value">Phase 1 — Fundament</div></div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">V-TAPER PRIORITÄTEN</div>
+    <div class="vtaper-list">
+      <div class="vtaper-item">
+        <div class="vtaper-stars">⭐⭐⭐</div>
+        <div class="vtaper-info">
+          <div class="vtaper-exercise">Schulterdrücken + Seitliches Heben</div>
+          <div class="vtaper-effect">Schulterbreite → oberes V</div>
+        </div>
+      </div>
+      <div class="vtaper-item">
+        <div class="vtaper-stars">⭐⭐⭐</div>
+        <div class="vtaper-info">
+          <div class="vtaper-exercise">Latziehen weit + eng</div>
+          <div class="vtaper-effect">Rückenbreite + Dicke → unteres V</div>
+        </div>
+      </div>
+      <div class="vtaper-item">
+        <div class="vtaper-stars">⭐⭐</div>
+        <div class="vtaper-info">
+          <div class="vtaper-exercise">Face Pulls</div>
+          <div class="vtaper-effect">Hintere Schulter → volle runde Schultern</div>
+        </div>
+      </div>
+      <div class="vtaper-item">
+        <div class="vtaper-stars">⭐⭐</div>
+        <div class="vtaper-info">
+          <div class="vtaper-exercise">Schrägbank vor Flachbank</div>
+          <div class="vtaper-effect">Obere Brust → Fülle & Tiefe</div>
+        </div>
+      </div>
+      <div class="vtaper-item">
+        <div class="vtaper-stars">⭐⭐</div>
+        <div class="vtaper-info">
+          <div class="vtaper-exercise">Trizeps (2 Übungen)</div>
+          <div class="vtaper-effect">2/3 des Oberarms → grosse Arme</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">PROGRESSIVE OVERLOAD</div>
+    <div class="info-card">
+      <p>Jede Woche das Ziel: minimal mehr Gewicht oder +1 Wiederholung. Nicht jede Übung jede Woche — aber der Trend über Monate muss aufwärtsgehen.</p>
+      <table class="overload-table" style="margin-top:12px">
+        <tr><th>Woche</th><th>Bankdrücken Beispiel</th></tr>
+        <tr><td>Woche 1</td><td>3 × 8 mit 20 kg</td></tr>
+        <tr><td>Woche 2</td><td>3 × 10 mit 20 kg</td></tr>
+        <tr><td>Woche 3</td><td>3 × 12 mit 20 kg</td></tr>
+        <tr><td>Woche 4</td><td>3 × 8 mit 22.5 kg → von vorne</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">AUFWÄRMEN</div>
+    <div class="info-card">
+      <p>Kein separates Aufwärmen nötig. Erste 1–2 Sätze jeder Übung mit ~50% des Arbeitsgewichts ausführen.</p>
+      <p>Beispiel: Schulterdrücken mit 20 kg geplant → erster Satz mit 10 kg, zweiter mit 15 kg, dann Vollgas.</p>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">KARDIO</div>
+    <div class="info-card">
+      <p>Nicht nötig. Kaloriendefizit läuft über die Ernährung.</p>
+      <p>Optional nach Monat 3 falls Fettabbau stagniert: 20 Min lockeres Ergometer 1–2×/Woche.</p>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">DEHNEN</div>
+    <div class="info-card" style="padding-bottom:8px">
+      <p style="margin-bottom:12px">3 Übungen nach jedem Training, je 30–40 Sekunden:</p>
+      <ul class="stretch-list">
+        <li class="stretch-item"><div class="stretch-num">1</div>Brustdehnung an der Wand</li>
+        <li class="stretch-item"><div class="stretch-num">2</div>Hüftbeuger-Stretch (ein Knie am Boden)</li>
+        <li class="stretch-item"><div class="stretch-num">3</div>Oberer Rücken (Arme vor dem Körper verschränken und runden)</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showTab(tabName, btn) {
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.remove('active-push', 'active-legs', 'active-pull', 'active-info');
+    });
+    document.getElementById('tab-' + tabName).classList.add('active');
+    btn.classList.add('active-' + tabName);
+  }
+
+  function toggleCard(card) {
+    // Prevent toggling when clicking inside an input
+    card.classList.toggle('open');
+  }
+
+  // Prevent card toggle when tapping input fields
+  document.querySelectorAll('.week-input').forEach(input => {
+    input.addEventListener('click', e => e.stopPropagation());
+  });
+
+  // Persist weight inputs in localStorage
+  function saveWeights() {
+    const data = {};
+    document.querySelectorAll('.week-input').forEach((input, i) => {
+      if (input.value) data[i] = input.value;
+    });
+    try { localStorage.setItem('tp_weights', JSON.stringify(data)); } catch(e){}
+  }
+
+  function loadWeights() {
+    try {
+      const data = JSON.parse(localStorage.getItem('tp_weights') || '{}');
+      document.querySelectorAll('.week-input').forEach((input, i) => {
+        if (data[i]) input.value = data[i];
+      });
+    } catch(e){}
+  }
+
+  document.querySelectorAll('.week-input').forEach(input => {
+    input.addEventListener('input', saveWeights);
+  });
+
+  loadWeights();
+</script>
+</body>
+</html>
